@@ -1,15 +1,12 @@
-# Analyzing Facebook Ad Costs with SQL
+ # ÖDEV_1:
+# "homeworks" Schema'sından facebook_ads_basic_daily tablosunu bulun ve sütunlarını okuyun.
+# ad_date, spend, clicks alanlarını ve spend/clicks oranını seçen bir SQL sorgusu yazın. 
+# Sorguya, tıklama sayısının sıfırdan büyük olması gerektiğine dair bir koşul ekleyin.
+# Ortaya çıkan tabloyu azalan sırada ad_date sütununa göre sıralayın.
 
-## 📝 Project Overview
-This SQL query analyzes Facebook advertising data to calculate the cost per click (CPC). The dataset contains daily spending and clicks for various ads.
+# ÇÖZÜM:
 
-## 🔍 Key Steps in the Query:
-1. Selected relevant columns: `ad_date`, `spend`, `clicks`, and calculated `CostPerClick (spend/clicks)`.
-2. Filtered out records where the number of clicks is zero to avoid division errors.
-3. Sorted the results in descending order based on `ad_date`.
-
-## 🛠️ SQL Query:
-SELECT ad_date, spend, clicks, spend/clicks AS CostPerClick
+SELECT ad_date , spend , clicks , spend/clicks AS CostPerClick
 FROM facebook_ads_basic_daily
-WHERE clicks > 0
-ORDER BY ad_date DESC;
+WHERE clicks>0 
+ORDER BY ad_date DESC ;
