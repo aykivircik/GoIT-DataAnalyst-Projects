@@ -1,4 +1,4 @@
- # ÖDEV_1:
+# ÖDEV_1:
 # "homeworks" Schema'sından facebook_ads_basic_daily tablosunu bulun ve sütunlarını okuyun.
 # ad_date, spend, clicks alanlarını ve spend/clicks oranını seçen bir SQL sorgusu yazın. 
 # Sorguya, tıklama sayısının sıfırdan büyük olması gerektiğine dair bir koşul ekleyin.
