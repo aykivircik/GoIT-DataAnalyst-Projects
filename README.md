@@ -1,23 +1,19 @@
-## 📊 Project 1: Facebook Ads - Cost Analysis with SQL  
-**Description:**  
-This project is the first assignment of the SQL module in the Data Analyst course I am taking from GoIT educational institution. The goal is to analyze Facebook Ads to determine the cost per click (CPC).  
+# 📊 GoIT Data Analyst - SQL Ödevleri  
 
-## 📝 Project Overview
-This SQL query analyzes Facebook advertising data to calculate the cost per click (CPC). The dataset contains daily spending and clicks for various ads.
+Bu repo, **GoIT Data Analyst** kursunda yaptığım **SQL ödevlerini** içermektedir.  
+Ödevler, farklı veri setleri üzerinde SQL sorguları yazarak analiz yapmayı amaçlamaktadır.  
 
-**SQL techniques used:**  
-- Filtering (`WHERE` clause)  
-- Ordering (`ORDER BY`)  
-- Basic calculations  
+## 📌 İçindekiler  
 
-## 🔍 Key Steps in the Query:
-1. Selected relevant columns: `ad_date`, `spend`, `clicks`, and calculated `CostPerClick (spend/clicks)`.
-2. Filtered out records where the number of clicks is zero to avoid division errors.
-3. Sorted the results in descending order based on `ad_date`.
+1. 
+2. 
+3.  
 
-### 🔍 Query:
-```sql
-SELECT ad_date, spend, clicks, spend/clicks AS CostPerClick
-FROM facebook_ads_basic_daily
-WHERE clicks > 0
-ORDER BY ad_date DESC;
+🚀 **Her ödev, ilgili veri setleriyle SQL sorgularını içerir.**  
+
+## 📌 Kullanılan Konular  
+✅ Temel SQL sorguları (SELECT, WHERE, ORDER BY)  
+✅ Veri filtreleme ve gruplama (GROUP BY, HAVING)  
+✅ Join işlemleri (INNER JOIN, LEFT JOIN)  
+✅ Alt sorgular ve CTE (WITH)  
+✅ Veri analizi için hesaplamalar  
