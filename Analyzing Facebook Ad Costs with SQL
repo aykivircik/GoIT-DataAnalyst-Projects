@@ -1,12 +1,23 @@
-# ÖDEV_1:
+## 📌 Project_1: Analyzing Facebook Ad Costs  
+**Description:**  
+The goal is to analyze Facebook Ads to determine the cost per click (CPC).  
+
+## Görevler:
 # "homeworks" Schema'sından facebook_ads_basic_daily tablosunu bulun ve sütunlarını okuyun.
 # ad_date, spend, clicks alanlarını ve spend/clicks oranını seçen bir SQL sorgusu yazın. 
 # Sorguya, tıklama sayısının sıfırdan büyük olması gerektiğine dair bir koşul ekleyin.
 # Ortaya çıkan tabloyu azalan sırada ad_date sütununa göre sıralayın.
 
 # ÇÖZÜM:
-
+```sql
 SELECT ad_date , spend , clicks , spend/clicks AS CostPerClick
 FROM facebook_ads_basic_daily
 WHERE clicks>0 
 ORDER BY ad_date DESC ;
+
+**SQL techniques used:**  
+- Filtering (`WHERE` clause)  
+- Ordering (`ORDER BY`)  
+- Basic calculations
+
+  
