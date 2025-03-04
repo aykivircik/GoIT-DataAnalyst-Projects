@@ -1,4 +1,4 @@
-## 📌 Project 1: Analyzing Facebook Ad Costs with SQL
+## 📊 Project 1: Facebook Ads - Cost Analysis with SQL  
 **Description:**  
 This project is the first assignment of the SQL module in the Data Analyst course I am taking from GoIT educational institution. The goal is to analyze Facebook Ads to determine the cost per click (CPC).  
 
