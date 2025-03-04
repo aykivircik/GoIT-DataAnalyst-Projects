@@ -14,3 +14,10 @@ This SQL query analyzes Facebook advertising data to calculate the cost per clic
 1. Selected relevant columns: `ad_date`, `spend`, `clicks`, and calculated `CostPerClick (spend/clicks)`.
 2. Filtered out records where the number of clicks is zero to avoid division errors.
 3. Sorted the results in descending order based on `ad_date`.
+
+### 🔍 Query:
+```sql
+SELECT ad_date, spend, clicks, spend/clicks AS CostPerClick
+FROM facebook_ads_basic_daily
+WHERE clicks > 0
+ORDER BY ad_date DESC;
