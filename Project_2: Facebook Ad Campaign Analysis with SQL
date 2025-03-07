@@ -1,0 +1,64 @@
+# Facebook Ad Campaign Analysis with SQL  
+
+## 📝 Project Description  
+This project analyzes the performance of Facebook ad campaigns using SQL.  
+Data is sourced from the `facebook_ads_basic_daily` table, and key metrics such as **CPC, CPM, CTR, and ROMI** are calculated.  
+
+##Görevler:
+#Aşağıdaki verileri facebook_ads_basic_daily tablosundan alacak bir SQL sorgusu yazın:
+ 	- ad_date (reklamın görüntülendiği tarih)
+ 	- campaign_id (kampanyanın benzersiz tanımlayıcısı)
+#Aşağıdaki göstergeler (metrikler) için tarih (ad_date) ve kampanya kimliğine (campaign_id) göre toplanmış (aggregate edilmiş) alanları oluşturun: 
+  - toplam maliyet
+	- gösterim sayısı
+	- tıklama sayısı
+	- total value değeri
+#Toplanan harcama ve dönüşüm oranlarını kullanarak her tarih ve kampanya kimliği için aşağıdaki metrikleri hesaplayın:
+ 	- CPC
+ 	- CPM
+  - CTR
+	- ROMI 
+#Bu görevi gerçekleştirmek için tabloyu ad_date ve campaign_id alanlarına göre gruplayın. 
+##NOT: Sıfıra bölme hatası almaktan kaçınmak için paydalar sıfır içermeyecek şekilde verileri filtreleyebilirsiniz.
+#Ek görevin açıklaması: 
+facebook_ads_basic_daily tablosunda toplam harcaması 500.000'den fazla olan kampanyalar arasında en yüksek ROMI'ye sahip kampanyayı bulun.
+
+## 📊 Metrics Used  
+- **CPC (Cost Per Click):** Total spend / total clicks  
+- **CPM (Cost Per Thousand Impressions):** (Total spend * 1000) / total impressions  
+- **CTR (Click Through Rate):** (Total clicks * 100) / total impressions  
+- **ROMI (Return on Marketing Investment):** (Total value - total spend) / total spend * 100  
+
+## Çözüm:  
+```sql
+SELECT ad_date, campaign_id,
+    SUM(spend) AS total_spend,
+    SUM(impressions) AS total_impression,
+    SUM(clicks) AS total_clicks,
+    SUM(value) AS total_value,
+    SUM(spend) / NULLIF(SUM(clicks), 0) AS CPC,
+    (SUM(spend) * 1000) / NULLIF(SUM(impressions), 0) AS CPM,
+    (CAST(SUM(clicks) AS FLOAT) / NULLIF(SUM(impressions), 0)) * 100 AS CTR,
+    ((CAST(SUM(value) AS FLOAT) - CAST(SUM(spend) AS FLOAT)) / NULLIF(SUM(spend), 0)) * 100 AS ROMI
+FROM facebook_ads_basic_daily
+WHERE impressions > 0 AND clicks > 0 AND spend > 0
+GROUP BY ad_date, campaign_id;
+
+##Ek Görev Çözümü:
+```sql
+SELECT campaign_id,
+    SUM(spend) AS total_spend,
+    SUM(impressions) AS total_impression,
+    SUM(clicks) AS total_clicks,
+    SUM(value) AS total_value,
+    SUM(spend) / NULLIF(SUM(clicks), 0) AS CPC,
+    (SUM(spend) * 1000) / NULLIF(SUM(impressions), 0) AS CPM,
+    (CAST(SUM(clicks) AS FLOAT) / NULLIF(SUM(impressions), 0)) * 100 AS CTR,
+    ((CAST(SUM(value) AS FLOAT) - CAST(SUM(spend) AS FLOAT)) / NULLIF(SUM(spend), 0)) * 100 AS ROMI
+FROM facebook_ads_basic_daily
+WHERE impressions > 0 AND clicks > 0 AND spend > 0
+GROUP BY campaign_id
+HAVING SUM(spend) > 500000
+ORDER BY ROMI DESC
+LIMIT 1;
+
