@@ -43,6 +43,7 @@ SELECT ad_date, campaign_id,
 FROM facebook_ads_basic_daily
 WHERE impressions > 0 AND clicks > 0 AND spend > 0
 GROUP BY ad_date, campaign_id;
+```
 
 ##Ek Görev Çözümü:
 ```sql
@@ -61,4 +62,4 @@ GROUP BY campaign_id
 HAVING SUM(spend) > 500000
 ORDER BY ROMI DESC
 LIMIT 1;
-
+```
