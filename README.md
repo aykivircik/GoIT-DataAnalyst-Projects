@@ -7,7 +7,10 @@ Bu repo, **GoIT Data Analyst** kursunda yaptığım **SQL ödevlerini** içermek
 
 1. Project_1: Analyzing Facebook Ad Costs with SQL
 2. Project_2: Facebook Ad Campaign Analysis with SQL
-3.  
+3. Project_3: Merging Advertising Data with SQL (CTE & UNION)
+4. Project_4:
+5. Project_5:
+6. Project_6:
 
 🚀 **Her ödev, ilgili veri setleriyle SQL sorgularını içerir.**  
 
