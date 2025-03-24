@@ -1,0 +1,74 @@
+Merging Advertising Data with SQL (CTE & UNION & JOIN)
+
+# 📝 Project Overview / Proje Genel Bakış
+-The goal is to extract relevant marketing insights by merging multiple tables and summarizing key metrics.
+Birden fazla tabloyu birleştirerek ve temel metrikleri özetleyerek ilgili pazarlama içgörülerini çıkarmayı hedefliyoruz.
+
+## Objectives / Hedefler
+-Use CTEs to merge data from facebook_ads_basic_daily, facebook_adset, and facebook_campaign tables.
+CTE'ler kullanarak facebook_ads_basic_daily, facebook_adset ve facebook_campaign tablolarındaki verileri birleştirmek.
+-Combine this data with google_ads_basic_daily using another CTE.
+Bu verileri, google_ads_basic_daily tablosuyla başka bir CTE kullanarak birleştirmek.
+-Summarize key performance metrics by grouping data by date, media source, campaign name, and adset name.
+Temel performans metriklerini tarih, medya kaynağı, kampanya adı ve reklam seti adına göre gruplandırarak özetlemek.
+-Filter out rows where spend, impressions, or clicks are zero.
+Harcama (spend), gösterim (impressions) veya tıklama (clicks) değeri sıfır olan satırları filtrelemek.
+-Calculate ROMI (Return on Marketing Investment) for campaigns with high ad spend.
+Yüksek reklam harcaması olan kampanyalar için ROMI (Return on Marketing Investment) hesaplamak.
+
+## SQL Query Explanation / SQL Sorgusunun Açıklaması
+-This query first merges Facebook advertising data using CTE_1. Then, it combines Facebook and Google data in CTE_2.
+Bu sorgu, önce Facebook reklam verilerini CTE_1 kullanarak birleştirir. Ardından, CTE_2 içinde Facebook ve Google verilerini birleştirir.
+-Finally, the combined data is grouped by date, media source, campaign name, and adset name to calculate total metrics.
+Son olarak, veriler tarih, medya kaynağı, kampanya adı ve reklam seti adına göre gruplandırılarak toplam metrikler hesaplanır.
+-This ensures a clear summary of advertising performance.
+Böylece reklam performansının net bir özeti elde edilir.
+
+## Technologies Used / Kullanılan Teknolojiler
+PostgreSQL
+Common Table Expressions (CTEs)
+SQL Joins (LEFT JOIN)
+Aggregation Functions (SUM)
+Filtering Conditions (WHERE, HAVING)
+
+```sql
+WITH CTE_1 AS 
+	 (SELECT fabd.ad_date, fc.campaign_name ,fa.adset_name, fabd.spend , fabd.impressions, fabd.reach, fabd.clicks ,fabd.leads ,fabd.value 
+      FROM  homeworks.facebook_ads_basic_daily AS fabd
+      LEFT JOIN public.facebook_adset AS fa
+	      ON fa.adset_id = fabd.adset_id 
+      LEFT JOIN public.facebook_campaign AS fc 
+	      ON fc.campaign_id = fabd.campaign_id),
+	  CTE_2 AS 
+	  (SELECT ad_date, 'Facebook' AS media_source, campaign_name, adset_name, spend, impressions, clicks, value
+	   FROM CTE_1
+	   UNION ALL 
+	   SELECT ad_date, 'Google' AS media_source, campaign_name, adset_name, spend, impressions, clicks, value
+	   FROM public.google_ads_basic_daily)
+SELECT ad_date, media_source, campaign_name, adset_name, sum(spend) AS total_cost, sum(impressions) AS total_impressions, sum(clicks) AS total_clicks, sum(value) AS total_value
+FROM CTE_2
+GROUP BY ad_date, media_source, campaign_name, adset_name
+ORDER BY ad_date;
+```
+
+## Ek görev tanımı:
+Toplam harcaması 500.000'den fazla olan tüm kampanyalar arasında en yüksek ROMI'ye sahip kampanyayı belirleyin.
+Bu kampanya içinde, en yüksek ROMI'ye sahip reklam grubunu (adset_name) belirleyin.
+
+--Ek görevin çözümü:
+```sql
+WITH CTE_1 AS 
+	 (SELECT fabd.ad_date, fc.campaign_name ,fa.adset_name, fabd.spend , fabd.impressions, fabd.reach, fabd.clicks ,fabd.leads ,fabd.value 
+      FROM  homeworks.facebook_ads_basic_daily AS fabd
+      LEFT JOIN public.facebook_adset AS fa
+	      ON fa.adset_id = fabd.adset_id 
+      LEFT JOIN public.facebook_campaign AS fc 
+	      ON fc.campaign_id = fabd.campaign_id)
+SELECT adset_name,
+       ((CAST(SUM(value) AS FLOAT) - CAST(SUM(spend) AS FLOAT)) / CAST(SUM(spend) AS FLOAT)) * 100 AS ROMI
+FROM CTE_1
+GROUP BY adset_name
+HAVING sum(spend)>500000
+ORDER BY ROMI DESC 
+LIMIT 1;
+```
