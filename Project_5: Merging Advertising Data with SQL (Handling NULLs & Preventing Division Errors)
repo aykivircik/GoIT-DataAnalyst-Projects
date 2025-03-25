@@ -1,0 +1,105 @@
+# Merging Advertising Data with SQL (Handling NULLs & Preventing Division Errors)
+
+## 📝 Project Description / Proje Tanımı
+-This project aims to analyze advertising data from Facebook and Google Ads using SQL. The goal is to consolidate and process the data to extract key performance metrics.
+Bu proje, Facebook ve Google Ads reklam verilerini SQL kullanarak analiz etmeyi amaçlamaktadır. Hedef, verileri birleştirerek temel performans metriklerini çıkarmaktır.
+
+## Objectives / Hedefler
+- Combine advertising data from different sources into a single dataset.
+Farklı kaynaklardan gelen reklam verilerini tek bir veri kümesinde birleştirmek.
+- Clean and preprocess the data by replacing NULL values with zero.
+NULL değerleri sıfır ile değiştirerek verileri temizlemek ve ön işleme tabi tutmak.
+- Extract UTM campaign values and normalize them.
+ UTM kampanya değerlerini çıkararak normalleştirmek.
+- Calculate key performance indicators (KPIs) such as CTR, CPC, CPM, and ROMI.
+CTR, CPC, CPM ve ROMI gibi temel performans göstergelerini hesaplamak.
+
+## SQL Query Explanation / SQL Sorgusunun Açıklaması
+1. CTE (Common Table Expression) for Data Consolidation
+Veri Birleştirme için CTE (Common Table Expression)
+   - The first CTE (`combined_data`) merges data from Facebook and Google Ads tables.
+   İlk CTE (`combined_data`), Facebook ve Google Ads tablolarındaki verileri birleştirir.
+   - NULL values are replaced with zero to ensure accurate calculations.
+   NULL değerleri sıfır ile değiştirilerek hesaplamaların doğruluğu sağlanır
+2. CTE for Data Processing and KPI Calculation
+Veri İşleme ve KPI Hesaplama için CTE
+   - Extracts `utm_campaign` using regular expressions.
+   Düzenli ifadeler (regex) kullanılarak `utm_campaign` değeri çıkarılır.
+   - Converts `utm_campaign` values to lowercase and replaces 'nan' with NULL.
+   `utm_campaign` değerleri küçük harfe çevrilir ve 'nan' olanlar NULL olarak değiştirilir.
+   - Computes aggregated metrics such as total cost, impressions, clicks, and value.
+   Toplam maliyet, gösterimler, tıklamalar ve dönüşüm değeri gibi metrikler hesaplanır.
+   - Calculates performance indicators: CTR, CPC, CPM, and ROMI, ensuring no division by zero errors.
+   Bölme hatalarından kaçınarak CTR, CPC, CPM ve ROMI performans göstergeleri hesaplanır.
+
+## Technologies Used / Kullanılan Teknolojiler
+- PostgreSQL
+- SQL Queries (Common Table Expressions, Aggregate Functions, String Functions, CASE Statements)
+
+```sql
+WITH combined_data AS (
+    SELECT
+        fb_ads.ad_date AS ad_date,
+        fb_ads.url_parameters AS url_parameters,
+        COALESCE(fb_ads.spend,0) AS spend,
+        COALESCE(fb_ads.impressions,0) AS impressions,
+        COALESCE(fb_ads.reach,0) AS reach,
+        fb_ads.clicks AS clicks,
+        fb_ads.leads AS leads,
+        fb_ads.value AS value
+    FROM
+        facebook_ads_basic_daily AS fb_ads
+    JOIN
+        facebook_adset AS fb_adset
+        ON fb_ads.adset_id = fb_adset.adset_id
+    JOIN
+        facebook_campaign AS fb_camp
+        ON fb_ads.campaign_id = fb_camp.campaign_id
+    UNION ALL
+    SELECT
+        ga.ad_date,
+        ga.url_parameters,
+        COALESCE(ga.spend,0) AS spend,
+        COALESCE(ga.impressions,0) AS impressions,
+        COALESCE(ga.reach,0) AS reach, 
+        ga.clicks AS clicks,
+        ga.leads AS leads,
+        ga.value AS value
+    FROM
+        google_ads_basic_daily AS ga
+),
+processed_data AS (
+    SELECT   
+        ad_date,
+        url_parameters,
+        CASE       
+	          WHEN LOWER((REGEXP_MATCH(url_parameters, 'utm_campaign=([^&]*)'))[1]) = 'nan' THEN NULL
+              ELSE LOWER((REGEXP_MATCH(url_parameters, 'utm_campaign=([^&]*)'))[1])
+        END AS utm_campaign,
+        coalesce(sum(spend), 0) as total_cost,
+        coalesce(sum(impressions), 0) as total_impressions,
+        coalesce(sum(clicks), 0) as total_clicks,
+        coalesce(sum(value), 0) as total_value,
+        CASE 
+        	WHEN sum(impressions) > 0 THEN ROUND((SUM(clicks)::numeric / SUM(impressions)::numeric) * 100, 2)
+        	ELSE 0
+        END AS CTR,
+        CASE         
+  			  WHEN sum(clicks) > 0 THEN round(sum(spend)::float/sum(clicks)::float)
+  	          ELSE 0
+        END AS CPC,
+        CASE 
+        	WHEN sum(impressions) > 0 THEN round((sum(spend)::numeric *100)/sum(impressions)::numeric,2)
+        	ELSE 0
+        END AS CPM,
+        CASE 
+        	WHEN sum(spend) > 0 THEN  round((sum(value)::numeric) / sum(spend),4) * 100
+        	ELSE 0
+        END AS ROMI
+        FROM
+        combined_data
+    GROUP BY ad_date, url_parameters)
+SELECT *
+FROM processed_data;
+```
+
