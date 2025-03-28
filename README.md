@@ -10,7 +10,7 @@ Bu repo, **GoIT Data Analyst** kursunda yaptığım **SQL ödevlerini** içermek
 3. Project_3: Merging Advertising Data with SQL (CTE & UNION)
 4. Project_4: Merging Advertising Data with SQL (CTE & UNION & JOIN)
 5. Project_5: Merging Advertising Data with SQL (Handling NULLs & Preventing Division Errors)
-6. Project_6:
+6. Project_6: Merging Advertising Data with SQL (Date & Window Functions)
 
 🚀 **Her ödev, ilgili veri setleriyle SQL sorgularını içerir.**  
 
