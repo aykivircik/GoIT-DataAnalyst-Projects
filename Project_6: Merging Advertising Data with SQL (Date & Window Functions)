@@ -1,0 +1,170 @@
+Merging Advertising Data with SQL (Date & Window Functions)
+
+## 📝 Project Overview / Proje Genel Bakış
+-This project focuses on merging advertising data from different sources, processing it for monthly trend analysis, and calculating performance metrics. By utilizing date functions, we extract the first day of the month, and with window functions, we compute the previous month's key performance indicators (KPIs). Finally, we calculate the percentage change in CPM, CPC, CTR, and ROMI compared to the previous month to understand campaign performance fluctuations.
+Bu proje, farklı kaynaklardan gelen reklam verilerini birleştirmeye, aylık eğilim analizleri için işlemeye ve performans metriklerini hesaplamaya odaklanmaktadır. Tarih fonksiyonları kullanılarak her ayın ilk günü çıkarılır ve pencere (window) fonksiyonları ile bir önceki aya ait temel performans göstergeleri (KPI'lar) hesaplanır. Son olarak, CPM, CPC, CTR ve ROMI'nin bir önceki aya göre yüzdesel değişimi hesaplanarak kampanya performansındaki dalgalanmalar analiz edilir.
+
+## Objectives / Hedefler
+-Combine advertising data from multiple sources into a unified dataset.
+Farklı kaynaklardan gelen reklam verilerini tek bir veri kümesinde birleştirmek.
+-Extract the first day of the month from the ad_date column to analyze monthly trends.
+Aylık eğilimleri analiz etmek için ad_date sütunundan ayın ilk gününü çıkarmak.
+-Use window functions to retrieve previous month's metrics for each campaign.
+Her kampanya için bir önceki aya ait metrikleri almak için pencere (window) fonksiyonlarını kullanmak.
+-Calculate the percentage change in CPM, CPC, CTR, and ROMI compared to the previous month.
+CPM, CPC, CTR ve ROMI'nin bir önceki aya göre yüzdesel değişimini hesaplamak.
+-Ensure accurate calculations by handling NULL and zero values appropriately.
+NULL ve sıfır değerleri uygun şekilde ele alarak hesaplamaların doğruluğunu sağlamak.
+
+## SQL Query Explanation / SQL Sorgusunun Açıklaması
+1. CTE (Common Table Expression) for Data Consolidation
+Veri Birleştirme için CTE (Common Table Expression)
+  -The first CTE (cte_1) merges data from Facebook and Google Ads using UNION ALL.
+  İlk CTE (cte_1), UNION ALL kullanarak Facebook ve Google Ads verilerini birleştirir.
+  -NULL metric values are replaced with zero using COALESCE to ensure accurate calculations.
+  NULL olan metrik değerleri COALESCE fonksiyonu ile sıfır olarak değiştirilerek hesaplamaların doğruluğu sağlanır.
+2. CTE for Data Processing and KPI Calculation
+Veri İşleme ve KPI Hesaplama için CTE
+  -Extracts utm_campaign values from url_parameters using regular expressions.
+  utm_campaign değerleri düzenli ifadeler (regex) kullanılarak url_parameters içinden çıkarılır.
+  -Converts utm_campaign values to lowercase and replaces 'nan' with NULL.
+  utm_campaign değerleri küçük harfe çevrilir ve 'nan' olanlar NULL olarak değiştirilir.
+  -Aggregates key metrics: total cost, impressions, clicks, and conversion value.
+  Toplam maliyet, gösterimler, tıklamalar ve dönüşüm değeri gibi temel metrikler toplanır.
+  -Calculates CTR, CPC, CPM, and ROMI while handling division errors with CASE statements.
+  CASE ifadeleri kullanılarak sıfıra bölme hatalarından kaçınılarak CTR, CPC, CPM ve ROMI hesaplanır.
+3. CTE for Monthly Aggregation and Trend Analysis
+Aylık Toplama ve Eğilim Analizi için CTE
+  -Extracts ad_month as the first day of the month from ad_date.
+  ad_date sütunundan ayın ilk günü olarak ad_month değeri çıkarılır.
+  -Uses LAG() window function to retrieve previous month's CPM, CPC, CTR, and ROMI for each campaign.
+  LAG() pencere fonksiyonu kullanılarak her kampanya için bir önceki aya ait CPM, CPC, CTR ve ROMI hesaplanır.
+4. Final Selection with Percentage Change Calculation
+Sonuç Seçimi ve Yüzdesel Değişim Hesaplama
+  -Computes the percentage difference in CPM, CPC, CTR, and ROMI compared to the previous month.
+  CPM, CPC, CTR ve ROMI'nin bir önceki aya göre yüzdesel değişimi hesaplanır.
+  -Ensures no division by zero errors by applying conditions in CASE statements.
+  CASE ifadeleri ile sıfıra bölme hatalarından kaçınılarak hesaplamaların doğruluğu sağlanır.
+
+## Technologies Used / Kullanılan Teknolojiler
+-PostgreSQL - Data extraction, transformation, and KPI calculations.
+PostgreSQL - Veri çıkarma, dönüştürme ve KPI hesaplamaları.
+-CTE (Common Table Expressions) - Structuring complex queries for better readability.
+CTE (Ortak Tablo İfadeleri) - Karmaşık sorguları daha okunabilir hale getirmek için kullanılır.
+-Window Functions (LAG()) - Retrieving previous month's values for trend analysis.
+Pencere Fonksiyonları (LAG()) - Eğilim analizi için bir önceki aya ait değerleri almak.
+-Date Functions (date_trunc) - Extracting the first day of the month.
+Tarih Fonksiyonları (date_trunc) - Ayın ilk gününü çıkarmak için kullanılır.
+-Regular Expressions (substring()) - Extracting UTM campaign values from URL parameters.
+Düzenli İfadeler (substring()) - URL parametrelerinden UTM kampanya değerlerini çıkarmak.
+
+```sql
+WITH cte_1 AS (
+    SELECT
+        fb_ads.ad_date AS ad_date,
+        fb_ads.url_parameters AS url_parameters,
+        COALESCE(fb_ads.spend,0) AS spend,
+        COALESCE(fb_ads.impressions,0) AS impressions,
+        COALESCE(fb_ads.reach,0) AS reach,
+        fb_ads.clicks AS clicks,
+        fb_ads.leads AS leads,
+        fb_ads.value AS value
+    FROM
+        facebook_ads_basic_daily AS fb_ads
+    JOIN
+        facebook_adset AS fb_adset
+        ON fb_ads.adset_id = fb_adset.adset_id
+    JOIN
+        facebook_campaign AS fb_camp
+        ON fb_ads.campaign_id = fb_camp.campaign_id
+    UNION ALL
+    SELECT
+        ga.ad_date,
+        ga.url_parameters,
+        COALESCE(ga.spend,0) AS spend,
+        COALESCE(ga.impressions,0) AS impressions,
+        COALESCE(ga.reach,0) AS reach,
+        ga.clicks AS clicks,
+        ga.leads AS leads,
+        ga.value AS value
+    FROM
+        google_ads_basic_daily AS ga
+),
+cte_2 AS (
+    SELECT
+        ad_date,
+        url_parameters,
+        CASE
+	        when lower(substring(url_parameters, 'utm_campaign=([^&#$]+)')) = 'nan' then null
+            else lower(substring(url_parameters, 'utm_campaign=([^&#$]+)'))
+        END AS utm_campaign,
+        coalesce(sum(spend), 0) as total_cost,
+        coalesce(sum(impressions), 0) as total_impressions,
+        coalesce(sum(clicks), 0) as total_clicks,
+        coalesce(sum(value), 0) as total_value,
+        CASE
+        	WHEN sum(impressions) > 0 THEN ROUND((SUM(clicks)::numeric / SUM(impressions)::numeric) * 100, 2)
+        	ELSE 0
+        END AS CTR,
+        CASE
+  			  WHEN sum(clicks) > 0 THEN round(sum(spend)::float/sum(clicks)::float)
+  	          ELSE 0
+        END AS CPC,
+        CASE
+        	WHEN sum(impressions) > 0 THEN round((sum(spend)::numeric *100)/sum(impressions)::numeric,2)
+        	ELSE 0
+        END AS CPM,
+        CASE
+        	WHEN sum(spend) > 0 THEN  round((sum(value)::numeric) / sum(spend),4) * 100
+        	ELSE 0
+        END AS ROMI
+    FROM cte_1
+    GROUP BY ad_date, url_parameters),
+cte_3 AS (
+	SELECT
+		date(date_trunc('month', ad_date)) AS ad_month,
+		utm_campaign,
+		total_cost,
+		total_impressions,
+		total_clicks,
+		total_value,
+		CTR,
+		CPC,
+		CPM,
+		ROMI,
+		lag(avg(CPM)) OVER (PARTITION BY utm_campaign ORDER BY DATE_TRUNC('month', ad_date)) AS previous_month_CPM,
+		lag(avg(CPC)) OVER (PARTITION BY utm_campaign ORDER BY DATE_TRUNC('month', ad_date)) AS previous_month_CPC,
+		lag(avg(CTR)) OVER (PARTITION BY utm_campaign ORDER BY DATE_TRUNC('month', ad_date)) AS previous_month_CTR,
+		lag(avg(ROMI)) OVER (PARTITION BY utm_campaign ORDER BY DATE_TRUNC('month', ad_date)) AS previous_month_ROMI
+	FROM cte_2
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,ad_date)
+SELECT
+	ad_month,
+	utm_campaign,
+	total_cost,
+	total_impressions,
+	total_clicks,
+	total_value,
+	previous_month_CTR,
+	previous_month_CPC,
+	previous_month_CPM,
+	previous_month_ROMI,
+	CASE
+		WHEN previous_month_CPM = 0 THEN 0
+		ELSE (CPM - previous_month_CPM) * 100 / previous_month_CPM	
+	END AS CPM_diff,
+	CASE
+		WHEN previous_month_CPC = 0 OR previous_month_CPC IS NULL THEN 0 
+		ELSE (CPC - previous_month_CPC) * 100 / previous_month_CPC 	
+	END AS CPC_diff,
+	CASE
+		WHEN previous_month_CTR = 0 THEN 0
+		ELSE (CTR - previous_month_CTR) * 100 / previous_month_CTR	
+	END AS CTR_diff,
+	CASE
+		WHEN previous_month_ROMI = 0 THEN 0
+		ELSE (ROMI - previous_month_ROMI) * 100 / previous_month_ROMI	
+	END AS ROMI_diff
+FROM cte_3
+ORDER BY ad_month;
+```
