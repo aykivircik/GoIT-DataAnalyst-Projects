@@ -17,6 +17,11 @@ Bu repo, **GoIT Data Analyst** kursunda yaptığım **SQL ödevlerini** içermek
 ## 📌 Kullanılan Konular  
 ✅ Temel SQL sorguları (SELECT, WHERE, ORDER BY)  
 ✅ Veri filtreleme ve gruplama (GROUP BY, HAVING)  
-✅ Join işlemleri (INNER JOIN, LEFT JOIN)  
-✅ Alt sorgular ve CTE (WITH)  
-✅ Veri analizi için hesaplamalar  
+✅ Veri analizi için hesaplamalar (Aggregate Functions) (SUM, AVG, ROUND)
+✅ Farklı veri kaynaklarını birleştirme (Joins & UNION ALL)  
+✅ Alt sorgular ve CTE (Common Table Expressions) (WITH ile)  
+✅ Sıfıra bölme hatalarından kaçınma (CASE Statements)
+✅ Eksik verileri yönetme (NULL Handling) (COALESCE)
+✅ Window Functions (LAG, PARTITION BY)
+
+
