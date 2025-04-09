@@ -1,4 +1,4 @@
-# Merging Advertising Data with SQL (Handling NULLs & Preventing Division Errors)
+# Facebook & Google Ad Campaign Analysis with SQL (Handling NULLs & Preventing Division Errors)
 
 ## 📝 Project Description / Proje Tanımı
 -This project aims to analyze advertising data from Facebook and Google Ads using SQL. The goal is to consolidate and process the data to extract key performance metrics.
