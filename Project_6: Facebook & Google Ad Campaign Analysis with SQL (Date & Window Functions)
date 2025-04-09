@@ -1,4 +1,4 @@
-Merging Advertising Data with SQL (Date & Window Functions)
+Facebook & Google Ad Campaign Analysis with SQL (Date & Window Functions)
 
 ## 📝 Project Overview / Proje Genel Bakış
 -This project focuses on merging advertising data from different sources, processing it for monthly trend analysis, and calculating performance metrics. By utilizing date functions, we extract the first day of the month, and with window functions, we compute the previous month's key performance indicators (KPIs). Finally, we calculate the percentage change in CPM, CPC, CTR, and ROMI compared to the previous month to understand campaign performance fluctuations.
