@@ -1,4 +1,4 @@
-# Advertising Analysis Data with SQL (CTE & UNION)
+# Facebook & Google Ad Campaign Analysis with SQL (CTE & UNION)
 
 ## 📝 Project Description / Proje Tanımı
 -The goal is to combine advertising data from two different sources (Google Ads and Facebook Ads) using Common Table Expressions (CTE) and UNION ALL.
